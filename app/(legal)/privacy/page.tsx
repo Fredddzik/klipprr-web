@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy — Klipprr",
   description: "Privacy Policy for Klipprr.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

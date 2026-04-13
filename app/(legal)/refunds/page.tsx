@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Refund Policy — Klipprr",
   description: "Refund and cancellation policy for Klipprr subscriptions.",
+  alternates: { canonical: "/refunds" },
 };
 
 export default function RefundsPage() {

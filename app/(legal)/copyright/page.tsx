@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Copyright & Takedown — Klipprr",
   description: "How to report copyright concerns related to Klipprr.",
+  alternates: { canonical: "/copyright" },
 };
 
 export default function CopyrightPage() {

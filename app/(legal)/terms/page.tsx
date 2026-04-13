@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service — Klipprr",
   description: "Terms of Service for Klipprr.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

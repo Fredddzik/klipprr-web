@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Cookie Policy — Klipprr",
   description: "Cookie policy for the Klipprr website.",
+  alternates: { canonical: "/cookies" },
 };
 
 export default function CookiesPage() {

@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/terms`, lastModified: new Date("2026-04-10") },
     { url: `${base}/cookies`, lastModified: new Date("2026-04-10") },
     { url: `${base}/refunds`, lastModified: new Date("2026-04-10") },
+    { url: `${base}/copyright`, lastModified: new Date("2026-04-10") },
   ];
 }
 
