@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "klipprr-web",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/Users/frederikhypky/dev/klipprr-web/node_modules/.bin/next",
+      "runtimeArgs": ["dev"],
       "port": 3000
     }
   ]
