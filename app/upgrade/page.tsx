@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import type { AuthResponse, Session, PostgrestSingleResponse, AuthError } from "@supabase/supabase-js";
+import { trackPurchase, trackCheckoutStarted } from "@/lib/analytics";
 
 const STRIPE_CHECKOUT_API = "/api/stripe/checkout";
 
@@ -50,8 +51,10 @@ export default function UpgradePage() {
   const [selectedTier, setSelectedTier] = useState<PaidTier>("pro");
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("yearly");
   const successParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("success") : null;
+  const sessionIdParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("session_id") : null;
   const canceledParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("canceled") : null;
   const [openAttempted, setOpenAttempted] = useState(false);
+  const [purchaseTracked, setPurchaseTracked] = useState(false);
 
   useEffect(() => {
     try { setSupabase(createSupabaseClient()); } catch (e) { console.error("[Upgrade] Supabase init failed:", e); }
@@ -103,6 +106,21 @@ export default function UpgradePage() {
 
   useEffect(() => { if (!supabase || !session?.user?.id) return; refreshLicense(); }, [supabase, session]);
   useEffect(() => { if (successParam === "1" && supabase && session?.user?.id) refreshLicense(); }, [successParam, supabase, session?.user?.id]);
+
+  useEffect(() => {
+    if (purchaseTracked) return;
+    if (successParam !== "1") return;
+    if (!license?.plan) return;
+    const key = sessionIdParam ? `klipprr_purchase_tracked_${sessionIdParam}` : null;
+    try {
+      if (key && sessionStorage.getItem(key)) { setPurchaseTracked(true); return; }
+      if (key) sessionStorage.setItem(key, "1");
+    } catch {
+      // ignore
+    }
+    trackPurchase(license.plan, billingPeriod, sessionIdParam ?? undefined);
+    setPurchaseTracked(true);
+  }, [billingPeriod, license?.plan, purchaseTracked, sessionIdParam, successParam]);
 
   if (!mounted) return null;
 
@@ -169,6 +187,7 @@ export default function UpgradePage() {
     if (!session?.access_token) { setStatus("Please log in first."); return; }
     setStripeLoading(true);
     setStatus(null);
+    trackCheckoutStarted(selectedTier, billingPeriod);
     try {
       const res = await fetch(STRIPE_CHECKOUT_API, {
         method: "POST",

@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
+import { trackSignup } from "@/lib/analytics";
+import { getAttribution } from "@/lib/utm";
 
 const DEFAULT_APP_REDIRECT = "clipagent://auth-callback";
 
@@ -63,6 +65,7 @@ function LoginInner() {
     setError(null);
     setAuthLoading(true);
     try {
+      const attribution = mode === "signup" ? getAttribution() : null;
       const { error: err } =
         mode === "signin"
           ? await supabase.auth.signInWithPassword({ email, password })
@@ -73,6 +76,7 @@ function LoginInner() {
                 emailRedirectTo: redirect
                   ? `https://klipprr.com/auth/callback?redirect=${encodeURIComponent(redirect)}`
                   : undefined,
+                data: attribution ? { attribution } : undefined,
               },
             });
       if (err) {
@@ -80,6 +84,7 @@ function LoginInner() {
         return;
       }
       if (mode === "signup") {
+        trackSignup("email");
         setError("Check your email to confirm your account, then sign in.");
       }
       if (redirect) {
@@ -106,6 +111,25 @@ function LoginInner() {
       setAuthLoading(false);
     }
   };
+
+  // Fire signup event for new OAuth users (user created within the last 60s).
+  // Email/password signup fires immediately in handleSignInWithPassword.
+  useEffect(() => {
+    if (!session?.user) return;
+    const createdAt = session.user.created_at ? Date.parse(session.user.created_at) : 0;
+    if (!createdAt) return;
+    const ageMs = Date.now() - createdAt;
+    if (ageMs < 0 || ageMs > 60_000) return;
+    const key = `klipprr_signup_tracked_${session.user.id}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+    } catch {
+      // ignore
+    }
+    const provider = (session.user.app_metadata as { provider?: string } | undefined)?.provider;
+    trackSignup(provider === "google" ? "google" : "email");
+  }, [session]);
 
   if (loading) {
     return (

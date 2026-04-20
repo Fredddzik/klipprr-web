@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { WindowsWaitlist } from "./WindowsWaitlist";
+import { DownloadButton } from "./DownloadButton";
 
 const GITHUB_REPO =
   (typeof process !== "undefined" && process.env.NEXT_PUBLIC_RELEASES_REPO) || "Fredddzik/klipprr";
@@ -172,16 +173,11 @@ export default async function DownloadPage() {
             </ul>
             <div className="mt-5">
               {(release?.macUrl ?? macDirectUrl) ? (
-                <a
+                <DownloadButton
                   href={(release?.macUrl ?? macDirectUrl)!}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-150 hover:from-violet-500 hover:to-fuchsia-500"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
-                  </svg>
-                  Download Klipprr{release ? ` v${release.version}` : ""}
-                  {release ? <span className="text-violet-200 font-normal">({release.macLabel})</span> : ""}
-                </a>
+                  version={release?.version}
+                  label={release?.macLabel}
+                />
               ) : (
                 <p className="text-sm text-zinc-600">Releases are not publicly available. Build from source or request access.</p>
               )}
