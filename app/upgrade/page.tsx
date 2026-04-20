@@ -85,13 +85,22 @@ export default function UpgradePage() {
     if (successParam !== "1") return;
     if (openAttempted) return;
     if (!session?.access_token || !session?.refresh_token) return;
-    const t = setTimeout(() => {
+    // Wait until the purchase event has been tracked before deep-linking to the
+    // desktop app. Navigating away to a custom protocol can abort in-flight
+    // Meta Pixel / GA4 beacons, so we let them fire first. Fallback after 3s
+    // in case license load fails so users still get redirected.
+    const trigger = () => {
       const deepLink = buildDeepLink("clipagent://auth-callback", session.access_token, session.refresh_token, session.expires_at ? String(session.expires_at) : undefined);
       setOpenAttempted(true);
       window.location.href = deepLink;
-    }, 500);
-    return () => clearTimeout(t);
-  }, [openAttempted, session?.access_token, session?.expires_at, session?.refresh_token, successParam]);
+    };
+    if (purchaseTracked) {
+      const t = setTimeout(trigger, 300);
+      return () => clearTimeout(t);
+    }
+    const fallback = setTimeout(trigger, 3000);
+    return () => clearTimeout(fallback);
+  }, [openAttempted, purchaseTracked, session?.access_token, session?.expires_at, session?.refresh_token, successParam]);
 
   const refreshLicense = () => {
     if (!supabase || !session?.user?.id) return;
