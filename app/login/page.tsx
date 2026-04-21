@@ -84,7 +84,7 @@ function LoginInner() {
         return;
       }
       if (mode === "signup") {
-        trackSignup("email");
+        trackSignup("email", { email });
         setError("Check your email to confirm your account, then sign in.");
       }
       if (redirect) {
@@ -128,7 +128,10 @@ function LoginInner() {
       // ignore
     }
     const provider = (session.user.app_metadata as { provider?: string } | undefined)?.provider;
-    trackSignup(provider === "google" ? "google" : "email");
+    trackSignup(provider === "google" ? "google" : "email", {
+      email: session.user.email ?? null,
+      userId: session.user.id,
+    });
   }, [session]);
 
   if (loading) {

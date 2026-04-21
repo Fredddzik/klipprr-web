@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import { sign, hashes as ed25519Hashes } from "@noble/ed25519";
 import { createHash } from "crypto";
+import { sendMetaEvent, sendGA4Event, planValueUSD } from "@/lib/server-analytics";
 
 // Force Node runtime so `crypto`/`Buffer` and noble hashing work reliably.
 export const runtime = "nodejs";
@@ -259,6 +260,84 @@ export async function POST(req: Request) {
       }
       const sub = await stripe.subscriptions.retrieve(subId, { expand: ["items.data.price"] });
       await upsertLicenseFromSubscription(sub as any, userId);
+
+      // Fire server-side Purchase events to Meta CAPI + GA4 Measurement Protocol.
+      // This path is 100% reliable (no ad blockers, no CSP, no regional script 204s).
+      // Dedupes with the browser pixel via event_id === session.id.
+      try {
+        const priceId = sub.items?.data?.[0]?.price?.id ?? null;
+        const plan =
+          (sub.metadata as any)?.klipprr_plan ??
+          (priceId === process.env.STRIPE_MAX_PRICE_ID_MONTHLY || priceId === process.env.STRIPE_MAX_PRICE_ID_YEARLY ? "max" : "pro");
+        const billing =
+          priceId && (priceId === process.env.STRIPE_PRO_PRICE_ID_YEARLY || priceId === process.env.STRIPE_MAX_PRICE_ID_YEARLY)
+            ? "yearly"
+            : "monthly";
+        const value = planValueUSD(String(plan), billing);
+
+        // Best-effort: pull email from Stripe customer (already stored with customer creation).
+        let email: string | null = null;
+        try {
+          const customer = await stripe.customers.retrieve(sub.customer as string);
+          if ("email" in customer) email = (customer.email ?? null) as string | null;
+        } catch {}
+
+        const eventId = session.id; // Stripe session id — matches what browser uses as transaction_id.
+
+        await Promise.allSettled([
+          sendMetaEvent({
+            eventName: "Purchase",
+            eventId,
+            eventSourceUrl: `https://klipprr.com/upgrade?success=1&session_id=${session.id}`,
+            userData: {
+              email,
+              externalId: userId,
+              ip: null,
+              userAgent: null,
+            },
+            customData: {
+              value,
+              currency: "USD",
+              content_name: plan,
+              order_id: session.id,
+            },
+          }),
+          sendGA4Event({
+            clientId: userId, // stable per-user so MP links with authenticated user
+            userId,
+            events: [
+              {
+                name: "purchase",
+                params: {
+                  transaction_id: session.id,
+                  value,
+                  currency: "USD",
+                  items: [
+                    {
+                      item_id: priceId ?? "",
+                      item_name: `klipprr_${plan}_${billing}`,
+                      price: value,
+                      quantity: 1,
+                    },
+                  ],
+                },
+              },
+              {
+                name: "klipprr_purchase",
+                params: {
+                  plan,
+                  billing,
+                  value,
+                  currency: "USD",
+                  transaction_id: session.id,
+                },
+              },
+            ],
+          }),
+        ]);
+      } catch (trackErr) {
+        console.error("[Stripe Webhook] server-side tracking failed (non-fatal)", trackErr);
+      }
       break;
     }
 

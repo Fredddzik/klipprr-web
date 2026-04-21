@@ -127,7 +127,10 @@ export default function UpgradePage() {
     } catch {
       // ignore
     }
-    trackPurchase(license.plan, billingPeriod, sessionIdParam ?? undefined);
+    trackPurchase(license.plan, billingPeriod, sessionIdParam ?? undefined, {
+      email: session?.user?.email ?? null,
+      userId: session?.user?.id ?? null,
+    });
     setPurchaseTracked(true);
   }, [billingPeriod, license?.plan, purchaseTracked, sessionIdParam, successParam]);
 
@@ -196,7 +199,10 @@ export default function UpgradePage() {
     if (!session?.access_token) { setStatus("Please log in first."); return; }
     setStripeLoading(true);
     setStatus(null);
-    trackCheckoutStarted(selectedTier, billingPeriod);
+    trackCheckoutStarted(selectedTier, billingPeriod, {
+      email: session?.user?.email ?? null,
+      userId: session?.user?.id ?? null,
+    });
     try {
       const res = await fetch(STRIPE_CHECKOUT_API, {
         method: "POST",
