@@ -77,6 +77,7 @@ export function Analytics() {
               window.gtag = gtag;
               gtag('js', new Date());
               gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: true });
+              gtag('config', 'AW-18112435043');
             `}
           </Script>
         </>
