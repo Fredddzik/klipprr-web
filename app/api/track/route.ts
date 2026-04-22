@@ -61,6 +61,24 @@ export async function POST(req: Request) {
   const ga4Params: Record<string, unknown> = {};
 
   switch (event) {
+    case "page_view":
+    case "pageview": {
+      metaEventName = "PageView";
+      ga4EventName = "page_view";
+      ga4Custom = null;
+      const path = typeof body.path === "string" ? body.path : undefined;
+      const title = typeof body.title === "string" ? body.title : undefined;
+      const referrer = typeof body.referrer === "string" ? body.referrer : undefined;
+      customData = { path, title };
+      Object.assign(ga4Params, {
+        page_location: sourceUrl,
+        page_path: path,
+        page_title: title,
+        page_referrer: referrer,
+        engagement_time_msec: 100, // required for realtime/active-user attribution
+      });
+      break;
+    }
     case "signup":
     case "complete_registration": {
       metaEventName = "CompleteRegistration";
@@ -108,6 +126,8 @@ export async function POST(req: Request) {
       return Response.json({ error: "unknown_event", event }, { status: 400 });
   }
 
+  const sessionId = typeof body.sessionId === "string" ? body.sessionId : undefined;
+
   const [metaRes, gaRes] = await Promise.allSettled([
     sendMetaEvent({
       eventName: metaEventName!,
@@ -119,6 +139,7 @@ export async function POST(req: Request) {
     sendGA4Event({
       clientId,
       userId: externalId ?? undefined,
+      sessionId,
       events: [
         { name: ga4EventName!, params: ga4Params },
         ...(ga4Custom ? [{ name: ga4Custom, params: ga4Params }] : []),

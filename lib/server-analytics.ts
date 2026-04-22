@@ -90,6 +90,7 @@ export async function sendMetaEvent(opts: MetaEventOpts): Promise<{ ok: boolean;
 type GA4EventOpts = {
   clientId: string; // stable per-user or per-session id
   userId?: string;
+  sessionId?: string;
   events: Array<{ name: string; params?: Record<string, unknown> }>;
 };
 
@@ -98,9 +99,22 @@ export async function sendGA4Event(opts: GA4EventOpts): Promise<{ ok: boolean; s
     return { ok: false, error: "ga4_mp_not_configured" };
   }
 
+  // GA4 requires engagement_time_msec and session_id on every event for it to
+  // register as an "active user" in Realtime reports. Without these, events
+  // land in DebugView but never in the main reports.
+  const sessionId = opts.sessionId ?? String(Math.floor(Date.now() / 1000));
+  const enrichedEvents = opts.events.map((e) => ({
+    name: e.name,
+    params: {
+      session_id: sessionId,
+      engagement_time_msec: 100,
+      ...(e.params ?? {}),
+    },
+  }));
+
   const payload: Record<string, unknown> = {
     client_id: opts.clientId,
-    events: opts.events,
+    events: enrichedEvents,
   };
   if (opts.userId) payload.user_id = opts.userId;
 
