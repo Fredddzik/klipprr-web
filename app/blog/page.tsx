@@ -1,21 +1,28 @@
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Blog — Klipprr",
   description:
-    "Tutorials and guides for clipping and downloading video on Mac. YouTube, Twitch, Instagram, and more.",
+    "Tutorials and guides for clipping, downloading, and exporting videos on Mac. Covers YouTube, Twitch VODs, Instagram Reels, Twitter/X clips, and workflow comparisons.",
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog — Klipprr",
     description:
-      "Tutorials and guides for clipping and downloading video on Mac.",
+      "Tutorials and guides for clipping, downloading, and exporting videos on Mac. Covers YouTube, Twitch VODs, Instagram Reels, Twitter/X clips, and workflow comparisons.",
     url: "https://klipprr.com/blog",
     type: "website",
   },
-  twitter: { card: "summary_large_image", site: "@klipprr", creator: "@klipprr" },
+  twitter: {
+    card: "summary_large_image",
+    site: "@klipprr",
+    creator: "@klipprr",
+    title: "Blog — Klipprr",
+    description: "Tutorials and guides for clipping and downloading video on Mac. YouTube, Twitch, Instagram, Twitter/X.",
+  },
 };
 
 type PostMeta = {
@@ -61,14 +68,26 @@ function getPosts(): PostMeta[] {
 export default function BlogPage() {
   const posts = getPosts();
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://klipprr.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://klipprr.com/blog" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" />
+            <Image src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" priority />
             <span className="text-lg font-semibold text-white">Klipprr</span>
           </Link>
           <Link
@@ -91,7 +110,7 @@ export default function BlogPage() {
 
           <h1 className="text-3xl font-bold text-white sm:text-4xl">Blog</h1>
           <p className="mt-3 text-zinc-400">
-            Tutorials and guides for clipping video on Mac.
+            Tutorials and guides for clipping video on Mac. We cover YouTube, Twitch VODs, Instagram Reels, and Twitter/X clips — from beginner how-tos to tool comparisons. If you clip video regularly on a Mac, you're in the right place.
           </p>
 
           <div className="mt-12 space-y-6">
@@ -105,7 +124,7 @@ export default function BlogPage() {
               >
                 <Link href={`/blog/${post.slug}`} className="block">
                   {post.date && (
-                    <time className="text-xs text-zinc-500">
+                    <time dateTime={post.date} className="text-xs text-zinc-500">
                       {new Date(post.date).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -132,8 +151,7 @@ export default function BlogPage() {
       <footer className="border-t border-zinc-800 py-10 px-6">
         <div className="mx-auto max-w-6xl flex flex-col items-center justify-between gap-4 sm:flex-row">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
+            <Image src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold text-white">Klipprr</span>
           </Link>
           <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500">

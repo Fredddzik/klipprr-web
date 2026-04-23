@@ -3,6 +3,7 @@ import path from "path";
 import { notFound } from "next/navigation";
 import { marked } from "marked";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 // ─── Frontmatter parser ──────────────────────────────────────────────────────
@@ -91,17 +92,32 @@ export default async function BlogPostPage({
 
   const articleJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: meta.title,
     description: meta.description,
+    image: `https://klipprr.com/opengraph-image`,
     datePublished: meta.date,
-    dateModified: meta.date,
+    dateModified: meta.modified ?? meta.date,
     url: `https://klipprr.com/blog/${slug}`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://klipprr.com/blog/${slug}`,
+    },
+    author: {
+      "@type": "Organization",
+      name: "Klipprr",
+      url: "https://klipprr.com",
+    },
     publisher: {
       "@type": "Organization",
       name: "Klipprr",
       url: "https://klipprr.com",
-      logo: "https://klipprr.com/logo.png",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://klipprr.com/logo.png",
+        width: 512,
+        height: 512,
+      },
     },
   };
 
@@ -135,8 +151,7 @@ export default async function BlogPostPage({
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" />
+            <Image src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" priority />
             <span className="text-lg font-semibold text-white">Klipprr</span>
           </Link>
           <Link
@@ -162,7 +177,7 @@ export default async function BlogPostPage({
           {/* Header */}
           <header className="mb-10">
             {meta.date && (
-              <time className="text-xs text-zinc-500">
+              <time dateTime={meta.date} className="text-xs text-zinc-500">
                 {new Date(meta.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
@@ -213,8 +228,7 @@ export default async function BlogPostPage({
       <footer className="border-t border-zinc-800 py-10 px-6">
         <div className="mx-auto max-w-6xl flex flex-col items-center justify-between gap-4 sm:flex-row">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
+            <Image src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold text-white">Klipprr</span>
           </Link>
           <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500">

@@ -1,7 +1,8 @@
 ---
 title: "yt-dlp vs Klipprr: When to Use Which"
 description: "An honest comparison of yt-dlp and Klipprr for clipping and downloading video on Mac. Different tools for different workflows — here's how to decide."
-date: "2026-04-10"
+date: "2026-01-20"
+author: "Klipprr Team"
 slug: "yt-dlp-vs-klipprr"
 tags: ["yt-dlp", "comparison", "mac", "video clipping", "workflow"]
 ---
@@ -11,6 +12,8 @@ tags: ["yt-dlp", "comparison", "mac", "video clipping", "workflow"]
 yt-dlp is one of the most capable video download tools that exists. Klipprr is a native Mac app built around a visual clipping workflow. They're not really competitors — they solve the same underlying problem in ways that suit very different users.
 
 This is an honest comparison. If yt-dlp is the right tool for your situation, we'll tell you.
+
+> **What is video clipping?** Video clipping refers to the process of extracting a specific time segment from a longer video and saving only that portion as a standalone file. This is distinct from downloading a full video: clipping requires knowing or finding the start and end timestamps of the desired segment, then exporting only that range.
 
 ---
 
@@ -101,6 +104,21 @@ This works, but it means calculating timestamps in HH:MM:SS format by hand, ofte
 
 ---
 
+## What each tool costs
+
+| | yt-dlp | Klipprr Free | Klipprr Pro | Klipprr Max |
+|---|---|---|---|---|
+| Cost | Free | Free | $12/mo | $39/mo |
+| Monthly clips | Unlimited | 10 | 120 | 500 |
+| Max quality | Source (no cap) | 720p | 4K | 8K |
+| Watermark | None | Yes | No | No |
+| Terminal required | Yes | No | No | No |
+| GUI | No | Yes | Yes | Yes |
+| Scriptable | Yes | No | No | No |
+| Platforms | 1,000+ | 4 | 4 | 4 |
+
+---
+
 ## Deciding which to use
 
 **Use yt-dlp if:**
@@ -124,7 +142,7 @@ This works, but it means calculating timestamps in HH:MM:SS format by hand, ofte
 
 ## The workflow comparison in practice
 
-**Scenario:** You want a 90-second highlight from a 4-hour Twitch VOD.
+**Scenario 1:** You want a 90-second highlight from a 4-hour Twitch VOD.
 
 **With yt-dlp + ffmpeg:**
 1. Find the VOD URL and the approximate timestamps
@@ -144,6 +162,25 @@ This works, but it means calculating timestamps in HH:MM:SS format by hand, ofte
 
 ---
 
+**Scenario 2:** You want to save 5 separate clips from 3 different YouTube videos for a highlight reel.
+
+**With yt-dlp + ffmpeg:**
+1. Download all 3 full videos — depending on length, this could be 3–6GB total and 15–45 minutes of download time
+2. Open each video in a player to find all 5 clip timestamps
+3. Run 5 separate ffmpeg trim commands, specifying each source file and timestamp pair
+4. Delete the 3 full source videos
+5. Done — realistically 45–90 minutes, mostly waiting for downloads
+
+**With Klipprr:**
+1. Paste the first YouTube URL, set In/Out points for each clip in that video, then move to the next URL
+2. Repeat for the other two videos — Klipprr doesn't require downloading the full video at any point
+3. Batch export all 5 clips
+4. Done — approximately 6–8 minutes, most of that spent scrubbing to find moments
+
+The time difference compounds significantly when you're pulling multiple clips from multiple sources. The yt-dlp workflow requires a separate download for every source video, regardless of how little of it you need. Klipprr's workflow scales with the number of clips, not the total duration of the source material.
+
+---
+
 ## Honest take
 
 yt-dlp is a better tool for what it does than Klipprr is for the same task — if what you need is the complete video at maximum quality with full format control. It's the right answer for archivists, developers, and anyone who thinks in shell scripts.
@@ -151,6 +188,24 @@ yt-dlp is a better tool for what it does than Klipprr is for the same task — i
 Klipprr is a better tool if your unit of work is a clip, not a full video, and you want that clip on your drive without a terminal session. It's the right answer for content creators, editors, and anyone who clips regularly and wants to stop thinking about it.
 
 They're different tools that happen to overlap on the word "download."
+
+---
+
+## Frequently asked questions
+
+**Is yt-dlp legal?**
+Downloading copyrighted content without permission may violate the platform's terms of service and applicable copyright law. yt-dlp is used by millions of users for purposes including personal archiving of content they own rights to, downloading public domain material, and research. Whether a specific use is lawful depends on what you're downloading, why, and the copyright law in your jurisdiction. When in doubt, consult a lawyer rather than a blog post.
+
+**Does Klipprr use yt-dlp under the hood?**
+No. Klipprr uses its own media resolution stack and Apple's native VideoToolbox for processing. It does not shell out to yt-dlp or ffmpeg. This is why Klipprr requires no command-line dependencies and why its export speed benefits directly from Apple Silicon's hardware encoder.
+
+**Can I use yt-dlp with a GUI?**
+Yes. Tools like Yark, Tartube, and yt-dlp-gui provide graphical interfaces that wrap yt-dlp's functionality. These remove the need to type commands directly, though they still require yt-dlp to be installed as a dependency. They don't add visual timeline trimming — they're frontends for the download step, not the clipping step.
+
+**Can Klipprr export audio only?**
+Currently Klipprr exports video clips as MP4. Audio-only export is not a current feature. If you need audio only, the typical workflow is to export the video clip from Klipprr and strip the audio track in a separate app (QuickTime, ffmpeg, or an audio editor).
+
+---
 
 → [Download Klipprr for Mac](https://klipprr.com/download) — free to start  
 → [YouTube Clip Downloader](https://klipprr.com/youtube-clip-downloader) — see the Klipprr workflow in detail

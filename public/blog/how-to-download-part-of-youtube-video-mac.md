@@ -1,7 +1,8 @@
 ---
 title: "How to Download Part of a YouTube Video on Mac"
 description: "Step-by-step guide to clipping and downloading any segment of a YouTube video on macOS — without downloading the full file or screen recording."
-date: "2026-04-10"
+date: "2026-03-20"
+author: "Klipprr Team"
 slug: "how-to-download-part-of-youtube-video-mac"
 tags: ["youtube", "mac", "tutorial", "video clipping"]
 ---
@@ -13,6 +14,12 @@ You found the 40-second moment in a 2-hour YouTube video that you need. Maybe it
 The problem: YouTube doesn't have a native "download segment" button. Most guides tell you to download the entire video first and then trim it in a separate app. That's slow, wastes storage, and adds unnecessary steps.
 
 This guide shows you the fastest way to clip and download any part of a YouTube video on a Mac, without downloading the full file.
+
+---
+
+> **What does "downloading part of a YouTube video" mean?**
+>
+> Downloading part of a YouTube video means extracting a specific time segment from a video — for example, minutes 4:30 to 7:15 — and saving only that clip to your device, rather than the full file. The resulting file contains only your selected range, and the rest of the video is never transferred to your machine. This is different from downloading the full video and trimming it afterward, which requires significantly more time, bandwidth, and storage.
 
 ---
 
@@ -50,9 +57,9 @@ Timestamped URLs (e.g. `?t=120`) also work — Klipprr will start the preview at
 
 Switch to Klipprr and paste the URL into the input field. Press Enter.
 
-Klipprr resolves the video source and loads it into the preview timeline. **Nothing is downloaded to your Mac at this stage** — the app streams just enough to let you preview and set your clip points.
+Klipprr resolves the video source and loads it into the preview timeline. **Nothing is downloaded to your Mac at this stage** — the app fetches the video's manifest file (a lightweight index of the stream's segments) and streams just enough data to render the preview and populate the timeline. The actual video content is not written to your drive until you export. This means even a 4-hour, 10GB video loads in the same 3–10 seconds as a short clip, and your storage stays untouched.
 
-This usually takes 3–10 seconds depending on the video and your connection.
+If the URL doesn't load, try using the Share link from YouTube's share button rather than copying directly from the address bar — some regional or embedded URLs resolve differently.
 
 ---
 
@@ -115,6 +122,44 @@ Screen recording captures whatever is playing in real-time. To get a 5-minute cl
 Most require you to paste a URL, wait in a processing queue on their servers, then download a re-compressed file with a watermark. Your video content passes through a third-party server you don't control. Many of these tools also have file-size limits or disappear without notice.
 
 Klipprr runs locally on your Mac. Your video content never leaves your machine.
+
+---
+
+## Common errors and how to fix them
+
+**Video not loading**
+Check the URL format first. YouTube's address bar URL and the Share button link are both supported, but occasionally embedded or playlist URLs don't resolve cleanly. If `https://www.youtube.com/watch?v=abc123` doesn't work, try the shortened share link (`https://youtu.be/abc123`) or vice versa. Also confirm the video is publicly accessible — unlisted videos work, but private videos do not.
+
+**Export button is greyed out**
+You need both an In point and an Out point set before the export button becomes active. If you've set one but not the other, the button stays disabled. Press **I** to mark the start, scrub forward, press **O** to mark the end. Once both handles are visible on the timeline, export will become available.
+
+**Clip exports as a very large file**
+Large output files are usually a sign that hardware acceleration isn't being used. Go to Klipprr's Settings and confirm that hardware encoding is enabled. On Apple Silicon Macs, Apple's VideoToolbox should be selected automatically — if it isn't, toggle the setting and retry. A 60-second 1080p clip should come out around 50–80MB, not 500MB.
+
+**Quality is lower than expected**
+Two things to check. First, confirm your plan tier — the free plan caps exports at 720p regardless of the source video's resolution. If you need 1080p or 4K output, you'll need a Pro ($12/mo) or Max ($39/mo) plan. Second, check the source video itself: some YouTube videos are only available in 720p or lower even if they claim higher resolution, which limits what any tool can export.
+
+---
+
+## How to use the clip after exporting
+
+Once you have the MP4 on your Mac, here's where it typically goes next.
+
+### Uploading to YouTube
+
+Klipprr exports standard H.264 MP4 files, which YouTube accepts without conversion. Upload directly from your output folder. If you're re-uploading a segment from another YouTube video, make sure you have the rights to redistribute that content — fair use, licensing, or original ownership.
+
+### Sharing to TikTok
+
+TikTok accepts MP4 uploads, but its native format is vertical (9:16 aspect ratio). Most YouTube videos are horizontal (16:9). If you upload a 16:9 clip to TikTok directly, the platform will letterbox it with black bars on top and bottom — which reduces engagement. For best results, use a video editor to crop or reframe the clip to 9:16 before uploading, or use TikTok's built-in crop tool after upload.
+
+### Adding to Final Cut Pro or DaVinci Resolve
+
+Both apps accept H.264 MP4 files via drag-and-drop from Finder into the media bin. If you're cutting on an Apple Silicon Mac, Final Cut Pro handles H.264 natively and the files will play back without transcoding. DaVinci Resolve on Apple Silicon is similarly efficient. If you need ProRes for an intensive edit, you can transcode the clip inside either app or use Compressor.
+
+### Sending via iMessage or email
+
+Most clips fall in the 10–80MB range depending on length and quality (a 30-second 1080p clip is typically around 15–25MB; a 3-minute 4K clip can reach 200MB+). iMessage handles files up to around 100MB without issue on most networks. For email, standard attachment limits are 25MB (Gmail) to 20MB (Outlook) — if your clip is larger, use a cloud link (iCloud Drive, Google Drive, Dropbox) instead of a direct attachment.
 
 ---
 

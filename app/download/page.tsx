@@ -121,7 +121,7 @@ export default async function DownloadPage() {
       <main className="relative mx-auto max-w-3xl px-6 py-16">
         {/* Heading */}
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Download Klipprr</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Download Klipprr for Mac</h1>
           <p className="mt-4 text-base text-zinc-400">
             Native desktop app for clipping and exporting exact video segments.
           </p>

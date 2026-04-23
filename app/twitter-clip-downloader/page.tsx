@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -32,20 +33,6 @@ export default function TwitterClipDownloaderPage() {
     ],
   };
 
-  const howToJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to download a Twitter or X video on Mac",
-    description: "Use Klipprr to save any video from a tweet to your Mac as a clean MP4 file.",
-    tool: [{ "@type": "HowToTool", name: "Klipprr", url: "https://klipprr.com" }],
-    step: [
-      { "@type": "HowToStep", position: 1, name: "Copy the tweet URL", text: "Find the tweet containing the video you want to save. Click the share icon on the tweet and choose 'Copy link', or copy the URL directly from your browser's address bar. Both twitter.com and x.com URLs work." },
-      { "@type": "HowToStep", position: 2, name: "Paste the URL into Klipprr", text: "Open Klipprr and paste the tweet URL. The app fetches the video and loads it for preview.", url: "https://klipprr.com/download" },
-      { "@type": "HowToStep", position: 3, name: "Trim if needed", text: "To save only part of the video, set In and Out points on the timeline. To save the full clip as-is, skip this step." },
-      { "@type": "HowToStep", position: 4, name: "Export to your Mac", text: "Click Export. The video is saved as an MP4 to your chosen folder. Processing is local — no third-party server involved." },
-    ],
-  };
-
   const softwareJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -72,20 +59,21 @@ export default function TwitterClipDownloaderPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" />
+            <Image src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" priority />
             <span className="text-lg font-semibold text-white">Klipprr</span>
           </Link>
-          <Link href="/download" className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-fuchsia-500 transition">
-            Download for Mac
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/blog" className="text-sm text-zinc-400 hover:text-white transition">Blog</Link>
+            <Link href="/download" className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-fuchsia-500 transition">
+              Download for Mac
+            </Link>
+          </div>
         </nav>
       </header>
 
@@ -184,6 +172,28 @@ export default function TwitterClipDownloaderPage() {
         </div>
       </section>
 
+      {/* Features */}
+      <section className="border-t border-zinc-800 py-20 px-6">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-2xl font-bold text-white sm:text-3xl">Built for saving video from X</h2>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            {[
+              { title: "Frame-precise trimming", body: "Set In and Out points at the exact frame. Want just 15 seconds of a longer clip? You get exactly that." },
+              { title: "No full download required", body: "Klipprr fetches only the segment you mark. Short tweets export in seconds." },
+              { title: "Hardware-accelerated on Apple Silicon", body: "Export uses Apple's VideoToolbox. M1, M2, M3 chips process clips in seconds." },
+              { title: "Local processing — your content stays yours", body: "No cloud queue. No upload. No third-party server touching your clips or your X session." },
+              { title: "Works with local files too", body: "Already downloaded the video? Load it directly from your Mac and clip from there." },
+              { title: "Both twitter.com and x.com URLs", body: "Paste either format — both are supported. The rebrand doesn't affect how video URLs resolve." },
+            ].map((f) => (
+              <div key={f.title} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+                <h3 className="text-sm font-semibold text-white">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-500">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-zinc-800 py-20 px-6">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-2xl font-bold text-white sm:text-3xl">Common questions</h2>
@@ -208,6 +218,27 @@ export default function TwitterClipDownloaderPage() {
         </div>
       </section>
 
+      {/* Also works with */}
+      <section className="border-t border-zinc-800 py-16 px-6">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-lg font-semibold text-white">Klipprr also works with</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <Link href="/youtube-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">YouTube Videos →</p>
+              <p className="mt-1 text-xs text-zinc-500">Clip any segment of any YouTube video.</p>
+            </Link>
+            <Link href="/twitch-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">Twitch VODs →</p>
+              <p className="mt-1 text-xs text-zinc-500">Clip highlights from any Twitch stream.</p>
+            </Link>
+            <Link href="/instagram-reel-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">Instagram Reels →</p>
+              <p className="mt-1 text-xs text-zinc-500">Save any Reel to your Mac locally.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-zinc-800 py-20 px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl font-bold text-white sm:text-3xl">Save it before it's deleted.</h2>
@@ -227,8 +258,7 @@ export default function TwitterClipDownloaderPage() {
       <footer className="border-t border-zinc-800 py-10 px-6">
         <div className="mx-auto max-w-6xl flex flex-col items-center justify-between gap-4 sm:flex-row">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
+            <Image src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold text-white">Klipprr</span>
           </Link>
           <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500">

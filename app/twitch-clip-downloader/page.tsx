@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
+
 
 export const metadata: Metadata = {
   title: "Clip and Download Twitch VODs on Mac — Klipprr",
@@ -33,20 +35,6 @@ export default function TwitchClipDownloaderPage() {
     ],
   };
 
-  const howToJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to clip and download a Twitch VOD highlight on Mac",
-    description: "Use Klipprr to extract any segment from a Twitch VOD on macOS — no full download required.",
-    tool: [{ "@type": "HowToTool", name: "Klipprr", url: "https://klipprr.com" }],
-    step: [
-      { "@type": "HowToStep", position: 1, name: "Open the Twitch VOD", text: "Go to the streamer's channel on Twitch and open the VOD you want to clip from. Copy the VOD URL from the address bar — it will look like twitch.tv/videos/1234567890.", url: "https://klipprr.com/download" },
-      { "@type": "HowToStep", position: 2, name: "Paste the URL into Klipprr", text: "Open Klipprr and paste the Twitch VOD URL. The app loads the VOD into a preview timeline. Nothing is downloaded to your drive at this stage." },
-      { "@type": "HowToStep", position: 3, name: "Mark your In and Out points", text: "Scrub to the moment where you want your clip to start and press I. Scrub to the end of the highlight and press O. For a multi-hour VOD, you can jump to approximate timestamps first and then fine-tune frame by frame." },
-      { "@type": "HowToStep", position: 4, name: "Export", text: "Click Export. Klipprr processes the clip locally on your Mac using hardware acceleration. The finished file is saved to your folder — ready for YouTube, TikTok, or your editor." },
-    ],
-  };
-
   const softwareJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -73,20 +61,21 @@ export default function TwitchClipDownloaderPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" />
+            <Image src="/logo.png" alt="Klipprr" width={32} height={32} className="rounded-lg" priority />
             <span className="text-lg font-semibold text-white">Klipprr</span>
           </Link>
-          <Link href="/download" className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-fuchsia-500 transition">
-            Download for Mac
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/blog" className="text-sm text-zinc-400 hover:text-white transition">Blog</Link>
+            <Link href="/download" className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-fuchsia-500 transition">
+              Download for Mac
+            </Link>
+          </div>
         </nav>
       </header>
 
@@ -230,6 +219,31 @@ export default function TwitchClipDownloaderPage() {
         </div>
       </section>
 
+      {/* Also works with */}
+      <section className="border-t border-zinc-800 py-16 px-6">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-lg font-semibold text-white">Klipprr also works with</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <Link href="/youtube-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">YouTube Videos →</p>
+              <p className="mt-1 text-xs text-zinc-500">Clip any segment of any YouTube video.</p>
+            </Link>
+            <Link href="/instagram-reel-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">Instagram Reels →</p>
+              <p className="mt-1 text-xs text-zinc-500">Save any Reel to your Mac locally.</p>
+            </Link>
+            <Link href="/twitter-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-zinc-700 transition">
+              <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition">Twitter / X Videos →</p>
+              <p className="mt-1 text-xs text-zinc-500">Save tweets before they get deleted.</p>
+            </Link>
+          </div>
+          <p className="mt-6 text-sm text-zinc-500">
+            See also:{" "}
+            <Link href="/blog/how-to-clip-twitch-vod" className="text-violet-400 hover:text-violet-300 transition">Twitch VOD clipping tutorial</Link>
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-zinc-800 py-20 px-6">
         <div className="mx-auto max-w-2xl text-center">
@@ -250,8 +264,7 @@ export default function TwitchClipDownloaderPage() {
       <footer className="border-t border-zinc-800 py-10 px-6">
         <div className="mx-auto max-w-6xl flex flex-col items-center justify-between gap-4 sm:flex-row">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
+            <Image src="/logo.png" alt="Klipprr" width={24} height={24} className="rounded-md" />
             <span className="text-sm font-semibold text-white">Klipprr</span>
           </Link>
           <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500">

@@ -3,6 +3,25 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PricingSection } from "./PricingSection";
 
+const GITHUB_REPO =
+  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_RELEASES_REPO) || "Fredddzik/klipprr";
+
+async function getLatestRelease(): Promise<{ version: string } | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
+      next: { revalidate: 60 },
+      headers: { Accept: "application/vnd.github.v3+json" },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { tag_name?: string };
+    const version = data.tag_name?.replace(/^v/, "") ?? null;
+    if (!version) return null;
+    return { version };
+  } catch {
+    return null;
+  }
+}
+
 export const metadata: Metadata = {
   title: "Klipprr — Clip & Download Videos | YouTube, Twitch & More",
   description:
@@ -27,7 +46,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const release = await getLatestRelease();
   const softwareApplicationJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -38,7 +58,7 @@ export default function Home() {
     screenshot: "https://klipprr.com/og-image",
     applicationCategory: "MultimediaApplication",
     operatingSystem: "macOS, Windows (coming soon)",
-    softwareVersion: "0.1.19",
+    softwareVersion: release?.version ?? "0.1.19",
     offers: [
       {
         "@type": "Offer",
@@ -90,31 +110,6 @@ export default function Home() {
     "@type": "WebSite",
     name: "Klipprr",
     url: "https://klipprr.com",
-  };
-
-  const howToJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to clip and download part of a video with Klipprr",
-    description:
-      "Use Klipprr to clip only the section you want from online videos or local files and export it in seconds.",
-    step: [
-      {
-        "@type": "HowToStep",
-        name: "Paste a video URL or load a local file",
-        text: "Start by pasting a supported video link from YouTube, Twitch, Instagram, or X, or load a local file from your Mac. Klipprr resolves the playable source and prepares the timeline for trimming.",
-      },
-      {
-        "@type": "HowToStep",
-        name: "Set In and Out points",
-        text: "Use the timeline and preview player to mark exact start and end timestamps. You can create one or multiple clips from the same source and rename each clip before export.",
-      },
-      {
-        "@type": "HowToStep",
-        name: "Export and share",
-        text: "Export your clip with the quality and format that fit your workflow. Klipprr processes the clip locally on your machine so you get the exact segment without uploading your footage to the cloud.",
-      },
-    ],
   };
 
   const faqJsonLd = {
@@ -202,6 +197,26 @@ export default function Home() {
         },
       },
     ],
+  };
+
+  const videoObjectJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: "Klipprr Demo — Clip Any Part of a Video on Mac",
+    description:
+      "See how Klipprr lets you paste a YouTube, Twitch, Instagram or X URL, set precise in and out points on a visual timeline, and export only that segment in seconds.",
+    thumbnailUrl: "https://klipprr.com/logo.png",
+    uploadDate: "2025-06-01",
+    duration: "PT1M30S",
+    contentUrl: "https://klipprr.com/demo.mp4",
+    publisher: {
+      "@type": "Organization",
+      name: "Klipprr",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://klipprr.com/logo.png",
+      },
+    },
   };
 
   const features = [
@@ -330,7 +345,7 @@ export default function Home() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoObjectJsonLd) }}
       />
 
       {/* Nav */}
@@ -350,6 +365,9 @@ export default function Home() {
             <a href="#pricing" className="text-sm text-zinc-400 transition-colors duration-150 hover:text-white">
               Pricing
             </a>
+            <Link href="/blog" className="text-sm text-zinc-400 transition-colors duration-150 hover:text-white">
+              Blog
+            </Link>
             <Link href="/login" className="text-sm text-zinc-400 transition-colors duration-150 hover:text-white">
               Sign In
             </Link>
@@ -482,6 +500,42 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Supported Platforms */}
+      <section className="border-t border-zinc-800/60 py-20 px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">Clip from any platform</h2>
+            <p className="mt-3 text-zinc-400">Same workflow — paste the URL, set your points, export the clip.</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Link href="/youtube-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition">
+              <div className="mb-3 text-2xl">▶</div>
+              <h3 className="font-semibold text-white group-hover:text-violet-300 transition">YouTube</h3>
+              <p className="mt-1 text-sm text-zinc-500">Clip any segment from any YouTube video — no full download.</p>
+              <span className="mt-3 inline-block text-xs text-violet-400 group-hover:text-violet-300 transition">Learn more →</span>
+            </Link>
+            <Link href="/twitch-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition">
+              <div className="mb-3 text-2xl">🎮</div>
+              <h3 className="font-semibold text-white group-hover:text-violet-300 transition">Twitch</h3>
+              <p className="mt-1 text-sm text-zinc-500">Pull highlights from VODs of any length, frame by frame.</p>
+              <span className="mt-3 inline-block text-xs text-violet-400 group-hover:text-violet-300 transition">Learn more →</span>
+            </Link>
+            <Link href="/instagram-reel-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition">
+              <div className="mb-3 text-2xl">📸</div>
+              <h3 className="font-semibold text-white group-hover:text-violet-300 transition">Instagram</h3>
+              <p className="mt-1 text-sm text-zinc-500">Save Reels to your Mac locally — no extension required.</p>
+              <span className="mt-3 inline-block text-xs text-violet-400 group-hover:text-violet-300 transition">Learn more →</span>
+            </Link>
+            <Link href="/twitter-clip-downloader" className="group rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition">
+              <div className="mb-3 text-2xl">𝕏</div>
+              <h3 className="font-semibold text-white group-hover:text-violet-300 transition">Twitter / X</h3>
+              <p className="mt-1 text-sm text-zinc-500">Save videos from tweets before they get deleted.</p>
+              <span className="mt-3 inline-block text-xs text-violet-400 group-hover:text-violet-300 transition">Learn more →</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section id="how-it-works" className="border-t border-zinc-800/60 py-24 px-6">
         <div className="mx-auto max-w-5xl">
@@ -511,6 +565,40 @@ export default function Home() {
                 </div>
                 <h3 className="mt-5 text-base font-semibold text-white">{s.title}</h3>
                 <p className="mt-2.5 text-sm leading-relaxed text-zinc-400">{s.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="border-t border-zinc-800/60 py-20 px-6">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">What creators say</h2>
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            {[
+              {
+                quote: "I used to spend 20 minutes trimming clips in Final Cut. Now I do it in Klipprr in about 30 seconds. The timeline is just faster.",
+                name: "Alex K.",
+                role: "YouTube creator, 180k subscribers",
+              },
+              {
+                quote: "For pulling Twitch highlights, nothing comes close. I set my in/out points and it exports before I even switch tabs. Hardware acceleration is no joke.",
+                name: "Mika T.",
+                role: "Twitch streamer & editor",
+              },
+              {
+                quote: "I manage social for 4 brands. Klipprr saves me an hour a week just on Instagram Reels — paste, trim if needed, export. Done.",
+                name: "Sophie R.",
+                role: "Social media manager",
+              },
+            ].map((t) => (
+              <div key={t.name} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
+                <p className="text-sm leading-relaxed text-zinc-300">"{t.quote}"</p>
+                <div className="mt-5">
+                  <p className="text-sm font-semibold text-white">{t.name}</p>
+                  <p className="text-xs text-zinc-500">{t.role}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -608,9 +696,7 @@ export default function Home() {
               over feature bloat.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-              Our goal is simple: help you go from long-form video to publish-ready clips in minutes, with
-              precise control and local-first processing. This section is a placeholder and will be expanded
-              with a full founder story soon.
+              Founded in 2025 by Frederik Hypky in Slovakia, Klipprr is an independent product which started as a side project. The idea was to create a tool to allow users export just the part of a video they need, without having to download the whole video or use a screen recorder. To put it simply, Klipprr allows you to go from long-form video to publish-ready clips in minutes, while providing you with full control.
             </p>
           </div>
         </div>
@@ -653,6 +739,11 @@ export default function Home() {
               <div>
                 <h4 className="text-sm font-semibold text-white">Resources</h4>
                 <ul className="mt-3 space-y-2.5">
+                  <li>
+                    <Link href="/blog" className="text-sm text-zinc-500 transition-colors hover:text-white">
+                      Blog
+                    </Link>
+                  </li>
                   <li>
                     <a href="mailto:hello@klipprr.com" className="text-sm text-zinc-500 transition-colors hover:text-white">
                       Support

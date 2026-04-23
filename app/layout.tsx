@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "Klipprr",
     locale: "en_US",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Klipprr — Clip & Download Videos" }],
   },
   icons: {
     icon: [{ url: "/favicon.ico", type: "image/x-icon", sizes: "16x16 32x32 48x48" }],
