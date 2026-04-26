@@ -3,6 +3,20 @@ import { Resend } from "resend";
 import { createServerClient } from "@/lib/supabase-server";
 
 // ---------------------------------------------------------------------------
+// Internal / test accounts — never include in email sequences
+// ---------------------------------------------------------------------------
+const EXCLUDED_EMAILS = new Set([
+  "freddy.hypky@gmail.com",
+  "frederik.hypky@gmail.com",
+  "veronika.hypka@gmail.com",
+  "denisprikryl16@gmail.com",
+  "tobi.pudis@gmail.com",
+  "dagestangriffin@gmail.com",
+  "adams.notebooklm@gmail.com",
+  "adams.tools@tuta.com",
+]);
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -241,6 +255,11 @@ export async function GET(request: Request) {
   const now = Date.now();
 
   for (const user of users as UserRow[]) {
+    if (EXCLUDED_EMAILS.has(user.email.toLowerCase())) {
+      results.push({ email: user.email, sent: null });
+      continue;
+    }
+
     const signupMs = new Date(user.created_at).getTime();
     const daysSince = (now - signupMs) / (1000 * 60 * 60 * 24);
     const clipsUsed = usageByUser.get(user.id) ?? 0;
