@@ -52,96 +52,162 @@ interface LogRow {
 }
 
 // ---------------------------------------------------------------------------
-// Email copy
+// HTML email template — Klipprr brand
+// ---------------------------------------------------------------------------
+
+function htmlEmail({
+  name,
+  body,
+  ctaText,
+  ctaUrl,
+}: {
+  name: string;
+  body: string; // paragraphs separated by \n\n
+  ctaText?: string;
+  ctaUrl?: string;
+}): string {
+  const paragraphs = body
+    .split("\n\n")
+    .map((p) => `<p style="margin:0 0 16px 0;color:#d4d4d8;font-size:15px;line-height:1.6;">${p.trim()}</p>`)
+    .join("\n");
+
+  const cta = ctaText && ctaUrl
+    ? `
+      <div style="margin:28px 0 8px 0;text-align:left;">
+        <a href="${ctaUrl}"
+           style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#7c3aed,#c026d3);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px;letter-spacing:0.01em;">
+          ${ctaText}
+        </a>
+      </div>`
+    : "";
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Klipprr</title>
+</head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+
+          <!-- Logo -->
+          <tr>
+            <td style="padding-bottom:28px;">
+              <img src="https://klipprr.com/logo.png" alt="Klipprr" width="40" height="40"
+                   style="border-radius:10px;display:block;"/>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background-color:#18181b;border:1px solid #27272a;border-radius:16px;padding:32px 36px;">
+
+              <!-- Greeting -->
+              <p style="margin:0 0 20px 0;color:#ffffff;font-size:16px;font-weight:500;line-height:1.5;">
+                Hey ${name},
+              </p>
+
+              <!-- Body -->
+              ${paragraphs}
+
+              <!-- CTA -->
+              ${cta}
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding-top:24px;text-align:left;">
+              <p style="margin:0;color:#52525b;font-size:12px;line-height:1.6;">
+                Frederik · Klipprr<br/>
+                <a href="https://klipprr.com" style="color:#52525b;text-decoration:underline;">klipprr.com</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+// ---------------------------------------------------------------------------
+// Email copy — returns subject, plain text, and HTML
 // ---------------------------------------------------------------------------
 
 function buildEmail(
   key: EmailKey,
-  firstName: string
-): { subject: string; text: string } | null {
-  const name = firstName || "there";
+  name: string
+): { subject: string; text: string; html: string } | null {
+  const n = name || "there";
 
   switch (key) {
-    case "welcome":
+    case "welcome": {
+      const subject = "Your Klipprr account is ready";
+      const body = `Welcome to Klipprr. You're all set on the account side — the one thing left is downloading the app so you can start making clips.\n\nOnce it's installed, open it and sign in with the same Google account you just used. Your free clips are waiting.`;
       return {
-        subject: "Your Klipprr account is ready",
-        text: `Hey ${name},
-
-Welcome to Klipprr. You're all set on the account side — the one thing left is downloading the app so you can start making clips.
-
-Download Klipprr for Mac: https://klipprr.com/download
-
-Once it's installed, open it and sign in with the same Google account you just used. Your free clips are waiting.
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nDownload Klipprr for Mac: https://klipprr.com/download\n\nFrederik`,
+        html: htmlEmail({ name: n, body, ctaText: "Download Klipprr for Mac →", ctaUrl: "https://klipprr.com/download" }),
       };
+    }
 
-    case "day1_nudge":
+    case "day1_nudge": {
+      const subject = "Did you get a chance to try it?";
+      const body = `Just checking in — did you get a chance to download Klipprr and make your first clip?\n\nIf you hit any snag during setup, just reply here and I'll sort it out directly. Otherwise, paste any YouTube, Twitch, X, or Instagram URL into the app and trim from there — takes about 30 seconds.`;
       return {
-        subject: "Did you get a chance to try it?",
-        text: `Hey ${name},
-
-Just checking in — did you get a chance to download Klipprr and make your first clip?
-
-If you hit any snag during setup, just reply here and I'll sort it out directly. Otherwise, paste any YouTube, Twitch, X, or Instagram URL into the app and trim from there — takes about 30 seconds.
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nFrederik`,
+        html: htmlEmail({ name: n, body, ctaText: "Download Klipprr →", ctaUrl: "https://klipprr.com/download" }),
       };
+    }
 
-    case "day3_inactive":
+    case "day3_inactive": {
+      const subject = "What's holding you back?";
+      const body = `You signed up a few days ago but haven't made a clip yet — totally fine, just curious what got in the way.\n\nWas it the download, something unclear in the app, or just haven't had the time? One line back would genuinely help me make Klipprr better for the next person.`;
       return {
-        subject: "What's holding you back?",
-        text: `Hey ${name},
-
-You signed up a few days ago but haven't made a clip yet — totally fine, just curious what got in the way.
-
-Was it the download, something unclear in the app, or just haven't had the time? One line back would genuinely help me make Klipprr better for the next person.
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nFrederik`,
+        html: htmlEmail({ name: n, body }),
       };
+    }
 
-    case "day3_activated":
+    case "day3_activated": {
+      const subject = "Your clips can look a lot better";
+      const body = `Glad you've been using Klipprr — here's something worth knowing: the free tier adds a watermark and caps export quality, so clips you share right now aren't showing the full picture.\n\nPro removes the watermark completely, unlocks full HD exports, and raises your monthly clip limit. If you're sharing clips anywhere publicly, it's worth it.`;
       return {
-        subject: "Your clips can look a lot better",
-        text: `Hey ${name},
-
-Glad you've been using Klipprr — here's something worth knowing: the free tier adds a watermark and caps export quality, so clips you share right now aren't showing the full picture.
-
-Pro removes the watermark completely, unlocks full HD exports, and raises your monthly clip limit: https://klipprr.com/upgrade
-
-If you're sharing clips anywhere publicly, it's worth it.
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nhttps://klipprr.com/upgrade\n\nFrederik`,
+        html: htmlEmail({ name: n, body, ctaText: "Upgrade to Pro →", ctaUrl: "https://klipprr.com/upgrade" }),
       };
+    }
 
-    case "day7_upgrade":
+    case "day7_upgrade": {
+      const subject = "Here's what you're missing on free";
+      const body = `Quick comparison — free vs. Pro on Klipprr:\n\nFree: watermark on every clip, capped quality, limited clips/month\nPro: no watermark, full HD, higher clip limit\n\nIf you're making clips to post anywhere, the watermark alone makes Pro worth it.`;
       return {
-        subject: "Here's what you're missing on free",
-        text: `Hey ${name},
-
-Quick comparison — free vs. Pro on Klipprr:
-
-Free: watermark on every clip, capped quality, limited clips/month
-Pro: no watermark, full HD, higher clip limit
-
-If you're making clips to post anywhere, the watermark alone makes Pro worth it: https://klipprr.com/upgrade
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nhttps://klipprr.com/upgrade\n\nFrederik`,
+        html: htmlEmail({ name: n, body, ctaText: "Remove the watermark →", ctaUrl: "https://klipprr.com/upgrade" }),
       };
+    }
 
-    case "day14_lasttouch":
+    case "day14_lasttouch": {
+      const subject = "Last email from me — quick question";
+      const body = `This is the last email I'll send about this — I promise.\n\nYou signed up for Klipprr a couple weeks ago and I never heard from you. I'm not going to pitch you again, I just genuinely want to know: was it the wrong time, wrong platform, missing feature, price — anything?\n\nOne line back is enough. It helps more than you know.`;
       return {
-        subject: "Last email from me — quick question",
-        text: `Hey ${name},
-
-This is the last email I'll send about this — I promise.
-
-You signed up for Klipprr a couple weeks ago and I never heard from you. I'm not going to pitch you again, I just genuinely want to know: was it the wrong time, wrong platform, missing feature, price — anything?
-
-One line back is enough. It helps more than you know.
-
-Frederik`,
+        subject,
+        text: `Hey ${n},\n\n${body}\n\nFrederik`,
+        html: htmlEmail({ name: n, body }),
       };
+    }
 
     default:
       return null;
@@ -149,7 +215,7 @@ Frederik`,
 }
 
 // ---------------------------------------------------------------------------
-// Sequence logic — determines which email (if any) to send to a user today
+// Sequence logic
 // ---------------------------------------------------------------------------
 
 function pickEmail(
@@ -158,30 +224,14 @@ function pickEmail(
   isPro: boolean,
   sent: Set<string>
 ): EmailKey | null {
-  // Exit sequence entirely once the user is Pro/Max
-  // (still send welcome if it somehow never went out)
-  const hasSentWelcome = sent.has("welcome");
-
-  if (!hasSentWelcome) return "welcome";
-
-  if (isPro) return null; // upgraded — nothing more to send
-
-  if (daysSince >= 1 && clipsUsed === 0 && !sent.has("day1_nudge")) {
-    return "day1_nudge";
-  }
-
+  if (!sent.has("welcome")) return "welcome";
+  if (isPro) return null;
+  if (daysSince >= 1 && clipsUsed === 0 && !sent.has("day1_nudge")) return "day1_nudge";
   if (daysSince >= 3 && !sent.has("day3_inactive") && !sent.has("day3_activated")) {
     return clipsUsed === 0 ? "day3_inactive" : "day3_activated";
   }
-
-  if (daysSince >= 7 && !sent.has("day7_upgrade")) {
-    return "day7_upgrade";
-  }
-
-  if (daysSince >= 14 && !sent.has("day14_lasttouch")) {
-    return "day14_lasttouch";
-  }
-
+  if (daysSince >= 7 && !sent.has("day7_upgrade")) return "day7_upgrade";
+  if (daysSince >= 14 && !sent.has("day14_lasttouch")) return "day14_lasttouch";
   return null;
 }
 
@@ -190,15 +240,10 @@ function pickEmail(
 // ---------------------------------------------------------------------------
 
 export async function GET(request: Request) {
-  // Protect the endpoint — Vercel passes this header on cron invocations,
-  // and we also allow a manual secret for local testing.
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isManualTrigger = cronSecret && authHeader === `Bearer ${cronSecret}`;
-
-  if (!isVercelCron && !isManualTrigger) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -211,7 +256,16 @@ export async function GET(request: Request) {
   const db = createServerClient();
   const results: { email: string; sent: EmailKey | null; error?: string }[] = [];
 
-  // 1. Load all users
+  // 1. Load all users + display names from auth metadata
+  const { data: authUsers } = await db.auth.admin.listUsers({ perPage: 1000 });
+  const displayNameById = new Map<string, string>();
+  for (const u of authUsers?.users ?? []) {
+    const meta = u.user_metadata as Record<string, string> | undefined;
+    const name = meta?.full_name ?? meta?.name ?? "";
+    if (name) displayNameById.set(u.id, name.split(" ")[0]); // first name only
+  }
+
+  // 2. Load profiles
   const { data: users, error: usersError } = await db
     .from("profiles")
     .select("id, email, created_at");
@@ -220,7 +274,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Failed to load users", detail: usersError }, { status: 500 });
   }
 
-  // 2. Load clip usage (all rows — aggregate per user in memory)
+  // 3. Clip usage
   const { data: usageRows } = await db
     .from("clip_usage_monthly")
     .select("user_id, clips_used") as { data: UsageRow[] | null };
@@ -230,7 +284,7 @@ export async function GET(request: Request) {
     usageByUser.set(row.user_id, (usageByUser.get(row.user_id) ?? 0) + row.clips_used);
   }
 
-  // 3. Load active licenses
+  // 4. Active licenses
   const { data: licenseRows } = await db
     .from("licenses")
     .select("user_id, plan, active")
@@ -241,7 +295,7 @@ export async function GET(request: Request) {
     planByUser.set(row.user_id, row.plan);
   }
 
-  // 4. Load already-sent email log
+  // 5. Email sequence log
   const { data: logRows } = await db
     .from("email_sequence_log")
     .select("user_id, email_key") as { data: LogRow[] | null };
@@ -252,7 +306,7 @@ export async function GET(request: Request) {
     sentByUser.get(row.user_id)!.add(row.email_key);
   }
 
-  // 5. Process each user
+  // 6. Process each user
   const now = Date.now();
 
   for (const user of users as UserRow[]) {
@@ -269,15 +323,17 @@ export async function GET(request: Request) {
     const sent = sentByUser.get(user.id) ?? new Set();
 
     const emailKey = pickEmail(daysSince, clipsUsed, isPro, sent);
-
     if (!emailKey) {
       results.push({ email: user.email, sent: null });
       continue;
     }
 
-    const firstName = user.email.split("@")[0].split(".")[0];
-    const content = buildEmail(emailKey, firstName);
+    // Prefer real display name from Google OAuth, fall back to email prefix
+    const firstName =
+      displayNameById.get(user.id) ??
+      user.email.split("@")[0].split(".")[0].replace(/\d+/g, "");
 
+    const content = buildEmail(emailKey, firstName);
     if (!content) {
       results.push({ email: user.email, sent: null });
       continue;
@@ -289,9 +345,9 @@ export async function GET(request: Request) {
         to: user.email,
         subject: content.subject,
         text: content.text,
+        html: content.html,
       });
 
-      // Log it so we never send again
       await db.from("email_sequence_log").insert({
         user_id: user.id,
         email_key: emailKey,
