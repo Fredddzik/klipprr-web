@@ -14,6 +14,7 @@ const EXCLUDED_EMAILS = new Set([
   "dagestangriffin@gmail.com",
   "adams.notebooklm@gmail.com",
   "adams.tools@tuta.com",
+  "ufcxtra.clips@gmail.com",
 ]);
 
 // ---------------------------------------------------------------------------
