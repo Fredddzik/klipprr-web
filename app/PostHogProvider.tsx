@@ -6,30 +6,33 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY!;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST!;
+const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 
-// Initialise once on mount
-function PostHogInit() {
+// Initialise at module level on the client — runs before any component mounts
+if (typeof window !== "undefined" && POSTHOG_KEY && POSTHOG_HOST) {
+  posthog.init(POSTHOG_KEY, {
+    api_host: POSTHOG_HOST,
+    person_profiles: "identified_only",
+    capture_pageview: false, // fired manually on route change below
+    capture_pageleave: true,
+  });
+}
+
+function PostHogPageview() {
   const pathname = usePathname();
   const ph = usePostHog();
 
   useEffect(() => {
-    if (!POSTHOG_KEY) return;
-    posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
-      person_profiles: "identified_only",
-      capture_pageview: false, // we fire manually below
-      capture_pageleave: true,
-    });
-  }, []);
-
-  // Capture page views on route change
-  useEffect(() => {
     ph?.capture("$pageview");
   }, [pathname, ph]);
 
-  // Identify user when session is available
+  return null;
+}
+
+function PostHogIdentity() {
+  const ph = usePostHog();
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
@@ -51,7 +54,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   if (!POSTHOG_KEY) return <>{children}</>;
   return (
     <PHProvider client={posthog}>
-      <PostHogInit />
+      <PostHogPageview />
+      <PostHogIdentity />
       {children}
     </PHProvider>
   );
