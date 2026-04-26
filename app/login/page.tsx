@@ -49,7 +49,7 @@ function LoginInner() {
   useEffect(() => {
     if (!session) return;
     if (isDesktopFlow) return;
-    router.replace("/account");
+    router.replace("/download");
   }, [isDesktopFlow, router, session]);
 
   const handleContinueToApp = () => {
