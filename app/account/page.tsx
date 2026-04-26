@@ -246,6 +246,19 @@ export default function AccountPage() {
                     ? `Renews/ends on ${exp}.`
                     : "Active subscription."}
             </p>
+            {plan === "free" && (
+              <div className="mt-4 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3">
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Free exports include a <span className="text-white font-medium">watermark</span> and are capped at <span className="text-white font-medium">720p</span>. Upgrade to Pro for no watermark, up to 4K, and 120 clips/month.
+                </p>
+                <Link
+                  href="/#pricing"
+                  className="mt-2.5 inline-flex items-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-violet-500/20 transition-all duration-150 hover:from-violet-500 hover:to-fuchsia-500"
+                >
+                  Upgrade to Pro →
+                </Link>
+              </div>
+            )}
             {plan !== "free" && subSummary?.cancel_at_period_end && (
               <p className="mt-2 text-xs text-amber-400">
                 Cancellation scheduled — access until end of current period.
