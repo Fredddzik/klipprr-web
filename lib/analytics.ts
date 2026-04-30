@@ -116,3 +116,30 @@ export function trackCheckoutStarted(plan: string, billing: string, user: UserCt
     externalId: user.userId ?? null,
   });
 }
+
+/**
+ * Called by the desktop app (via POST /api/track) after each successful export.
+ * Also exposed here for any future web context that knows about a clip export.
+ *
+ * Desktop app usage:
+ *   POST /api/track { event: "clip_exported", plan, clip_count, quality, externalId, email }
+ */
+export function trackClipExported(opts: {
+  plan: string;
+  clipCount?: number;
+  quality?: string;
+  user?: UserCtx;
+}) {
+  ga("klipprr_clip_exported", {
+    plan: opts.plan,
+    ...(opts.clipCount !== undefined && { clip_count: opts.clipCount }),
+    ...(opts.quality && { quality: opts.quality }),
+  });
+  server("clip_exported", {
+    plan: opts.plan,
+    ...(opts.clipCount !== undefined && { clip_count: opts.clipCount }),
+    ...(opts.quality && { quality: opts.quality }),
+    email: opts.user?.email ?? null,
+    externalId: opts.user?.userId ?? null,
+  });
+}

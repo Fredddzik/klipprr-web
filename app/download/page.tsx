@@ -223,22 +223,32 @@ export default async function DownloadPage() {
 
         {/* Installation guide */}
         <section className="mt-8 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6">
-          <h2 className="text-base font-semibold text-white">Installation Guide (macOS)</h2>
+          <h2 className="text-base font-semibold text-white">Your first clip in under 2 minutes</h2>
           <ol className="mt-4 space-y-2.5">
             {[
-              "Download the latest macOS build from the button above.",
-              "Open the .dmg and drag Klipprr into your Applications folder.",
-              "Launch Klipprr and allow it in macOS security prompts if required.",
-              "Paste a URL or load a local file, set clip points, and export.",
-            ].map((step, i) => (
-              <li key={step} className="flex items-start gap-3 text-sm text-zinc-400">
+              { step: "Download and drag Klipprr into your Applications folder.", detail: "~225 MB, takes about 30 seconds." },
+              { step: "Open the app — allow it through macOS security prompts if asked.", detail: "Just once, on first launch." },
+              { step: "Paste any YouTube, Twitch, Instagram, or X URL into the app.", detail: "No account required for the free tier." },
+              { step: "Set your in and out points on the timeline, then hit Export.", detail: "Hardware-accelerated — done in seconds, not minutes." },
+            ].map(({ step, detail }, i) => (
+              <li key={step} className="flex items-start gap-3 text-sm">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-zinc-500">
                   {i + 1}
                 </span>
-                {step}
+                <span>
+                  <span className="text-zinc-300">{step}</span>{" "}
+                  <span className="text-zinc-600">{detail}</span>
+                </span>
               </li>
             ))}
           </ol>
+          <div className="mt-5 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3">
+            <p className="text-xs text-zinc-400">
+              <span className="font-medium text-white">Hitting the watermark or clip limit?</span>{" "}
+              Upgrade to Pro — no watermark, 4K exports, 120 clips/month for $12/mo.{" "}
+              <a href="/upgrade" className="text-violet-400 hover:text-violet-300 transition-colors">Upgrade →</a>
+            </p>
+          </div>
         </section>
 
         {/* Formats & Plans */}
@@ -255,6 +265,29 @@ export default async function DownloadPage() {
             <Link href="/privacy" className="text-violet-400 transition-colors hover:text-violet-300">Privacy Policy</Link>
             {" "}for processing details.
           </p>
+        </section>
+
+        {/* Account nudge — gets downloaders into the email sequence */}
+        <section className="mt-4 rounded-2xl border border-zinc-800/60 bg-zinc-900/30 p-5">
+          <div className="flex items-start gap-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500/10 text-violet-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white">Track your clips across sessions</p>
+              <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+                Create a free account to keep your clip count synced and unlock upgrades when you need them. Takes 10 seconds.
+              </p>
+              <Link
+                href="/login"
+                className="mt-3 inline-flex items-center rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:border-violet-500/50 hover:text-white"
+              >
+                Create free account →
+              </Link>
+            </div>
+          </div>
         </section>
 
         <div className="mt-8 flex items-center justify-between">

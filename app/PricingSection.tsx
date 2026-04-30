@@ -230,10 +230,10 @@ export function PricingSection() {
 
                 {tier.monthlyPrice === 0 ? (
                   <Link
-                    href="/login"
+                    href="/download"
                     className="mt-7 rounded-xl bg-zinc-100 py-2.5 text-center text-sm font-semibold uppercase tracking-wide text-zinc-900 transition hover:bg-zinc-200"
                   >
-                    {tier.ctaLabel}
+                    Download Free
                   </Link>
                 ) : (
                   <button
@@ -248,9 +248,13 @@ export function PricingSection() {
                   >
                     {checkoutLoading
                       ? "Redirecting…"
-                      : mode === "yearly"
-                        ? `Upgrade (yearly)`
-                        : `Upgrade (monthly)`}
+                      : tier.name === "Pro"
+                        ? mode === "yearly"
+                          ? "Remove watermark — $10/mo"
+                          : "Remove watermark — $12/mo"
+                        : mode === "yearly"
+                          ? "Get Max — $33/mo"
+                          : "Get Max — $39/mo"}
                   </button>
                 )}
               </div>

@@ -252,7 +252,7 @@ export default function AccountPage() {
                   Free exports include a <span className="text-white font-medium">watermark</span> and are capped at <span className="text-white font-medium">720p</span>. Upgrade to Pro for no watermark, up to 4K, and 120 clips/month.
                 </p>
                 <Link
-                  href="/#pricing"
+                  href="/upgrade"
                   className="mt-2.5 inline-flex items-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-violet-500/20 transition-all duration-150 hover:from-violet-500 hover:to-fuchsia-500"
                 >
                   Upgrade to Pro →
@@ -274,7 +274,7 @@ export default function AccountPage() {
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link
-                href="/#pricing"
+                href="/upgrade"
                 className="rounded-full border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-300 transition-all duration-150 hover:border-zinc-600 hover:text-white"
               >
                 Change plan

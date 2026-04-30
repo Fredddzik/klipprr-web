@@ -256,6 +256,28 @@ export default function UpgradePage() {
 
         <div className="w-full max-w-sm rounded-2xl border border-zinc-800/80 bg-zinc-900/70 p-7 shadow-2xl backdrop-blur-sm">
           <h1 className="text-xl font-bold text-white">Upgrade Klipprr</h1>
+          <ul className="mt-3 space-y-1.5 border-b border-zinc-800 pb-5">
+            {[
+              "No watermark on exported clips",
+              "Up to 4K quality (Pro) or 8K (Max)",
+              "120–500 clips per month",
+              "Choose your export path",
+            ].map((item) => (
+              <li key={item} className="flex items-center gap-2 text-xs text-zinc-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-emerald-400">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <blockquote className="mt-5 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3">
+            <p className="text-xs leading-relaxed text-zinc-400">
+              &ldquo;I used to spend 20 minutes trimming clips in Final Cut. Now I do it in Klipprr in about 30 seconds.&rdquo;
+            </p>
+            <footer className="mt-2 text-[10px] text-zinc-600">Alex K. · YouTube creator, 180k subscribers</footer>
+          </blockquote>
 
           {!session && (
             <div className="mt-5 space-y-3">

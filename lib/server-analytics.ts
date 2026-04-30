@@ -1,8 +1,37 @@
-// Server-side analytics: Meta Conversions API + GA4 Measurement Protocol.
+// Server-side analytics: Meta Conversions API + GA4 Measurement Protocol + PostHog.
 // Fires from our server, so no ad blockers / browser network filters can stop it.
 // All functions are no-ops when env vars missing — safe to call unconditionally.
 
 import { createHash, randomUUID } from "crypto";
+
+const POSTHOG_API_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://app.posthog.com";
+
+type PostHogEventOpts = {
+  distinctId: string;
+  event: string;
+  properties?: Record<string, unknown>;
+};
+
+export async function sendPostHogEvent(opts: PostHogEventOpts): Promise<{ ok: boolean; error?: string }> {
+  if (!POSTHOG_API_KEY) return { ok: false, error: "posthog_not_configured" };
+  try {
+    const res = await fetch(`${POSTHOG_HOST}/capture/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: POSTHOG_API_KEY,
+        event: opts.event,
+        distinct_id: opts.distinctId,
+        properties: opts.properties ?? {},
+      }),
+    });
+    if (!res.ok) return { ok: false, error: `posthog_http_${res.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
 
 const META_PIXEL_ID = process.env.META_PIXEL_ID ?? process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;

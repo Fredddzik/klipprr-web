@@ -1,4 +1,4 @@
-import { sendMetaEvent, sendGA4Event, makeEventId } from "@/lib/server-analytics";
+import { sendMetaEvent, sendGA4Event, sendPostHogEvent, makeEventId } from "@/lib/server-analytics";
 
 export const runtime = "nodejs";
 
@@ -122,28 +122,54 @@ export async function POST(req: Request) {
       Object.assign(ga4Params, { transaction_id: eventId, plan, billing, value, currency: "USD" });
       break;
     }
+    case "clip_exported": {
+      // Fired by the desktop app after each successful export.
+      // No Meta or GA4 mapping — PostHog only (see below).
+      metaEventName = null;
+      ga4EventName = null;
+      ga4Custom = null;
+      const plan = typeof body.plan === "string" ? body.plan : "free";
+      const clipCount = typeof body.clip_count === "number" ? body.clip_count : undefined;
+      const quality = typeof body.quality === "string" ? body.quality : undefined;
+      Object.assign(ga4Params, { plan, ...(clipCount !== undefined && { clip_count: clipCount }), ...(quality && { quality }) });
+      break;
+    }
     default:
       return Response.json({ error: "unknown_event", event }, { status: 400 });
   }
 
   const sessionId = typeof body.sessionId === "string" ? body.sessionId : undefined;
+  const phDistinctId = externalId ?? clientId;
 
-  const [metaRes, gaRes] = await Promise.allSettled([
-    sendMetaEvent({
-      eventName: metaEventName!,
-      eventId,
-      eventSourceUrl: sourceUrl,
-      userData: { email, externalId, ip, userAgent, fbp, fbc },
-      customData,
-    }),
-    sendGA4Event({
-      clientId,
-      userId: externalId ?? undefined,
-      sessionId,
-      events: [
-        { name: ga4EventName!, params: ga4Params },
-        ...(ga4Custom ? [{ name: ga4Custom, params: ga4Params }] : []),
-      ],
+  const [metaRes, gaRes, phRes] = await Promise.allSettled([
+    metaEventName
+      ? sendMetaEvent({
+          eventName: metaEventName,
+          eventId,
+          eventSourceUrl: sourceUrl,
+          userData: { email, externalId, ip, userAgent, fbp, fbc },
+          customData,
+        })
+      : Promise.resolve({ ok: true, skipped: true }),
+    ga4EventName
+      ? sendGA4Event({
+          clientId,
+          userId: externalId ?? undefined,
+          sessionId,
+          events: [
+            { name: ga4EventName, params: ga4Params },
+            ...(ga4Custom ? [{ name: ga4Custom, params: ga4Params }] : []),
+          ],
+        })
+      : Promise.resolve({ ok: true, skipped: true }),
+    sendPostHogEvent({
+      distinctId: phDistinctId,
+      event: `klipprr_${event}`,
+      properties: {
+        ...ga4Params,
+        ...(email ? { email } : {}),
+        source: "server",
+      },
     }),
   ]);
 
@@ -152,5 +178,6 @@ export async function POST(req: Request) {
     eventId,
     meta: metaRes.status === "fulfilled" ? metaRes.value : { ok: false, error: String(metaRes.reason) },
     ga4: gaRes.status === "fulfilled" ? gaRes.value : { ok: false, error: String(gaRes.reason) },
+    posthog: phRes.status === "fulfilled" ? phRes.value : { ok: false, error: String(phRes.reason) },
   });
 }

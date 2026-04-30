@@ -422,21 +422,21 @@ export default async function Home() {
               href="/download"
               className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-all duration-200 hover:from-violet-500 hover:to-fuchsia-500 hover:shadow-violet-500/40"
             >
-              Download for Mac
-            </Link>
-            <Link
-              href="/download"
-              className="rounded-full border border-zinc-700 bg-zinc-900/60 px-6 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:border-violet-500/60 hover:text-white"
-            >
-              Windows? Join the waitlist →
+              Download for Mac — Free
             </Link>
             <a
               href="#demo"
-              className="rounded-full border border-zinc-700 bg-zinc-900/60 px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:border-zinc-600 hover:bg-zinc-800/60"
+              className="rounded-full border border-zinc-700 bg-zinc-900/60 px-6 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:border-zinc-600 hover:text-white"
             >
               Watch Demo
             </a>
           </div>
+          <p className="mt-4 text-xs text-zinc-600">
+            No account required · Apple Silicon ·{" "}
+            <a href="/download" className="text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
+              Windows? Join the waitlist →
+            </a>
+          </p>
         </div>
       </section>
 
